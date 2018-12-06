@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PokeApp</string>
+    <string name="search_hint">Enter the name of a Pokemon</string>
+    <string name="serverAddress">https://myrazpi.com/</string>
+    <string name="currentGen">7</string>
+    <integer-array name="generations">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </integer-array>
+</resources>
