@@ -62,29 +62,69 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void queryPokemon(String pokename){
+    private void queryPokemon(final String pokename){
         Spinner genDropdown = findViewById(R.id.generation);
         String generation = genDropdown.getSelectedItem().toString();
         String endpoint = "pokemon";
-        RequestParams params = new RequestParams();
+        final RequestParams params = new RequestParams();
         params.add("name", pokename);
         params.add("generation", generation);
         HttpRequest.get(serverAddress, endpoint, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try{
-                    Log.d("Type 1", response.getString("type1"));
+                    Pokemon pokemon = new Pokemon();
+                    pokemon.setName(response.getString("name"));
+                    pokemon.setNationalNumber(response.getInt("number"));
+                    pokemon.setType1(response.getString("type1"));
+                    try{
+                        pokemon.setType2(response.getString("type2"));
+                    } catch (JSONException e){ }
+                    try{
+                        pokemon.setEvolvesInto(response.getJSONArray("evolvesInto").getJSONObject(0).getString("name"));
+                    } catch (JSONException e){}
+                    try{
+                        pokemon.setEvolvesFrom(response.getJSONObject("evolvesFrom").getString("name"));
+                    } catch(JSONException e){}
+                    JSONArray weaknesses = response.getJSONArray("weaknesses");
+                    for(int i = 0; i < weaknesses.length(); i++)
+                        pokemon.addWeakness(weaknesses.getString(i));
+                    JSONArray superWeaknesses = response.getJSONArray("superweaknesses");
+                    for(int i = 0; i < superWeaknesses.length(); i++)
+                        pokemon.addSuperWeakness(superWeaknesses.getString(i));
+                    JSONArray resistances = response.getJSONArray("resistances");
+                    for(int i = 0; i < resistances.length(); i++)
+                        pokemon.addResistance(resistances.getString(i));
+                    JSONArray superResistances = response.getJSONArray("superresistances");
+                    for(int i = 0; i < superResistances.length(); i++)
+                        pokemon.addSuperResistance(superResistances.getString(i));
+                    JSONArray unaffeccted = response.getJSONArray("unaffected");
+                    for(int i = 0; i < unaffeccted.length(); i++)
+                        pokemon.addUnaffected(unaffeccted.getString(i));
+                    Log.d("Pokemon", pokemon.toString());
+                    TextView textView = findViewById(R.id.pokemonResponse);
+                    textView.setText(pokemon.toString());
+                    textView.setTextColor(Color.BLACK);
                 } catch (JSONException e){
+                    TextView textView = findViewById(R.id.pokemonResponse);
+                    textView.setText("Error parsing response");
+                    textView.setTextColor(Color.RED);
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                TextView textView = findViewById(R.id.pokemonResponse);
                 try{
                     Log.e("PokeQuery", errorResponse.getString("message"));
+                    textView.setText(errorResponse.getString("message"));
+                    textView.setTextColor(Color.RED);
+
                 } catch (JSONException e){
                     Log.e("PokeQuery", "Error Querying Pokemon");
+                    textView.setText("Error Querying Pokemon");
+                    textView.setTextColor(Color.RED);
                 }
             }
         });
