@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                     String[] pokemon = new String[arr.length()];
                     Log.d("ResStatus","got list");
                     for(int i = 0; i < arr.length(); i++) {
+                        Log.d("Pokemmon", arr.getString(i));
                         pokemon[i] = arr.getString(i);
                     }
                     ArrayAdapter<String> adapterPokemon = new ArrayAdapter<String>
